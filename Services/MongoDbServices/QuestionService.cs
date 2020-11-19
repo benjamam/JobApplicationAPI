@@ -22,6 +22,11 @@ namespace JobApplicationAPI.Services
             return _questions.Find(q => true).ToList();
         }
 
+        public QuestionContent GetQuestion(string id)
+        {
+            return _questions.Find(q => q.Id == id).FirstOrDefault();
+        }
+
         public QuestionContent CreateQuestion(QuestionContent question)
         {
             _questions.InsertOne(question);

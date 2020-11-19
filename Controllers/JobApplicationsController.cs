@@ -1,5 +1,6 @@
 ﻿using JobApplicationAPI.Models;
 using JobApplicationAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -16,67 +17,69 @@ namespace JobApplicationAPI.Controllers
             _jobApplicationService = jobApplicationService;
         }
 
-        // GET: api/<JobApplicationsController>
         [HttpGet]
-        public List<JobApplication> Get()
+        public ActionResult<List<JobApplicationDTO>> Get()
         {
-
-            return _jobApplicationService.GetApplications(true);
-        }
-
-        // GET api/<JobApplicationsController>/5
-        //[HttpGet("{id}")]
-        //public AcceptedApplications Get(int id)
-        //{
-        //    var acceptedApplications = new AcceptedApplications();
-        //    acceptedApplications.Applications.Add(new JobApplication()
-        //    {
-        //        Name = "Adam",
-        //        Questions = new List<QuestionContent>()
-        //        {
-        //            new QuestionContent()
-        //            {
-        //                Id = "1",
-        //                Question = "How old are you?",
-        //                Answer = "16"
-        //            }
-        //        }
-        //    });
-
-        //    return acceptedApplications;
-        //}
-
-        // POST api/<JobApplicationsController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-            var jobApp = new JobApplication()
+            try
             {
-                Name = "Adam's Test 2",
-                IsQualified = true,
-                Questions = new List<QuestionResponse>()
+                var jobApps = _jobApplicationService.GetApplications(false);
+                var jobAppsDTO = new List<JobApplicationDTO>();
+                mapJobApplications(jobApps, jobAppsDTO);
+
+                return jobAppsDTO;
+            }
+            catch
+            {
+                // log here
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error has occurred when trying to GET Job Applications. It has been logged and is being looked into.");
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult Post([FromBody] JobApplication application)
+        {
+            try
+            {
+                if (ModelState.IsValid)
                 {
-                    new QuestionResponse()
-                    {
-                        Id = "1",
-                        Answer = "16"
-                    }
+                    _jobApplicationService.CreateApplication(application);
+                    var jobAppDTO = new JobApplicationDTO();
+                    mapJobApplication(application, jobAppDTO);
+                    return Created("", jobAppDTO);
                 }
-            };
-            _jobApplicationService.CreateApplication(jobApp);
+                else
+                {
+                    return BadRequest(ModelState);
+                }
+            }
+            catch
+            {
+                // log here
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error has occurred when trying to POST the Job Application. It has been logged and is being looked into");
+            }
+
         }
 
-        // PUT api/<JobApplicationsController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // this would be handled by a mapper like AutoMapper or custom Mapper implementation if I had more time
+        private void mapJobApplications(List<JobApplication> jobApps, List<JobApplicationDTO> jobAppsDTO)
         {
+            foreach (var app in jobApps)
+            {
+                jobAppsDTO.Add(new JobApplicationDTO()
+                {
+                    Name = app.Name,
+                    IsQualified = app.IsQualified,
+                    Questions = app.Questions
+                });
+            }
         }
 
-        // DELETE api/<JobApplicationsController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        private void mapJobApplication(JobApplication jobApp, JobApplicationDTO jobAppDTO)
         {
+            jobAppDTO.Name = jobApp.Name;
+            jobAppDTO.Questions = jobApp.Questions;
+            jobAppDTO.IsQualified = jobApp.IsQualified;
         }
-
     }
 }

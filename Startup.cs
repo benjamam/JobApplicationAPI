@@ -28,6 +28,7 @@ namespace JobApplicationAPI
                 sp.GetRequiredService<IOptions<JobApplicationsDatabaseSettings>>().Value);
 
             services.AddSingleton<JobApplicationService>();
+            services.AddSingleton<QuestionService>();
 
             services.AddControllers();
         }
