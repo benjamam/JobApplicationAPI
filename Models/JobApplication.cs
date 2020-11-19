@@ -26,32 +26,21 @@ namespace JobApplicationAPI.Models
         /// - All questions must be answered
         /// - All questions must be answered correctly
         /// </summary>
-        /// <param name="questions"></param>
-        public void ValidateQualifications(List<QuestionContent> questions)
+        /// <param name="masterListOfQuestions"></param>
+        public void ValidateQualifications(List<QuestionContent> masterListOfQuestions)
         {
-            // optimize Questions by turning them into a Dict, saving O(Questions.Length) runtime
-            var questionDict = new Dictionary<string, QuestionResponse>();
-            foreach (var questionResp in Questions)
+
+            addQuestionsToQuestionReponse(masterListOfQuestions);
+
+            if (Questions.Count != masterListOfQuestions.Count)
             {
-                questionDict.TryAdd(questionResp.Id, questionResp);
+                IsQualified = false;
+                return;
             }
 
-            foreach (var question in questions)
+            foreach (var question in Questions)
             {
-                // potential performance improvement: turn AcceptanceAnswers into Dict to save O(N) runtime here
-                // current runtime of this method: O(questions.Length^2)
-                if (questionDict.ContainsKey(question.Id))
-                {
-                    // question is valid
-                    questionDict[question.Id].Question = question.Question;
-
-                    if (!question.AcceptedAnswers.Contains(questionDict[question.Id].Answer))
-                    {
-                        IsQualified = false;
-                        return;
-                    }
-                }
-                else
+                if (!question.IsAnswerAccepted)
                 {
                     IsQualified = false;
                     return;
@@ -60,6 +49,37 @@ namespace JobApplicationAPI.Models
 
             IsQualified = true;
             return;
+        }
+
+        private void addQuestionsToQuestionReponse(List<QuestionContent> masterListOfQuestions)
+        {
+            // optimize Questions by turning them into a Dict, saving O(Questions.Length) runtime
+            var questionDict = new Dictionary<string, QuestionResponse>();
+            foreach (var questionResp in Questions)
+            {
+                questionDict.TryAdd(questionResp.Id, questionResp);
+            }
+
+            // add question property QuestionResponse if ids match
+            foreach (var question in masterListOfQuestions)
+            {
+                // potential performance improvement: turn AcceptanceAnswers into Dict to save O(N) runtime here
+                // current runtime of this method: O(questions.Length^2)
+                if (questionDict.ContainsKey(question.Id))
+                {
+                    // question is valid
+                    questionDict[question.Id].Question = question.Question;
+
+                    if (question.AcceptedAnswers.Contains(questionDict[question.Id].Answer))
+                    {
+                        questionDict[question.Id].IsAnswerAccepted = true;
+                    }
+                    else
+                    {
+                        questionDict[question.Id].IsAnswerAccepted = false;
+                    }
+                }
+            }
         }
     }
 
@@ -70,5 +90,6 @@ namespace JobApplicationAPI.Models
         public string Question { get; set; }
         [Required]
         public string Answer { get; set; }
+        public bool IsAnswerAccepted { get; set; }
     }
 }
