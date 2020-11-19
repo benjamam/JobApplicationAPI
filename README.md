@@ -6,3 +6,5 @@ Built using:
 Tested using:
 - Postman
 - Test repo: https://github.com/benjamam/JobApplicationAPITests
+
+Simple front end to display accepted applications to employer
