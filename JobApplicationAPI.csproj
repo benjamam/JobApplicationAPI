@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
+    <PackageReference Include="RhinoMocks" Version="3.6.1" />
   </ItemGroup>
 
 
