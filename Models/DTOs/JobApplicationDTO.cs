@@ -8,7 +8,6 @@ namespace JobApplicationAPI.Models
         {
             Questions = new List<QuestionResponse>();
         }
-        public bool IsQualified { get; set; }
         public string Name { get; set; }
         public List<QuestionResponse> Questions { get; set; }
     }

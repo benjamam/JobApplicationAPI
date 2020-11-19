@@ -69,7 +69,6 @@ namespace JobApplicationAPI.Controllers
                 jobAppsDTO.Add(new JobApplicationDTO()
                 {
                     Name = app.Name,
-                    IsQualified = app.IsQualified,
                     Questions = app.Questions
                 });
             }
@@ -79,7 +78,6 @@ namespace JobApplicationAPI.Controllers
         {
             jobAppDTO.Name = jobApp.Name;
             jobAppDTO.Questions = jobApp.Questions;
-            jobAppDTO.IsQualified = jobApp.IsQualified;
         }
     }
 }
