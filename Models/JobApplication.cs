@@ -40,10 +40,16 @@ namespace JobApplicationAPI.Models
             {
                 // potential performance improvement: turn AcceptanceAnswers into Dict to save O(N) runtime here
                 // current runtime of this method: O(questions.Length^2)
-                if (questionDict.ContainsKey(question.Id) && question.AcceptedAnswers.Contains(questionDict[question.Id].Answer))
+                if (questionDict.ContainsKey(question.Id))
                 {
                     // question is valid
-                    continue;
+                    questionDict[question.Id].Question = question.Question;
+
+                    if (!question.AcceptedAnswers.Contains(questionDict[question.Id].Answer))
+                    {
+                        IsQualified = false;
+                        return;
+                    }
                 }
                 else
                 {
@@ -61,6 +67,7 @@ namespace JobApplicationAPI.Models
     {
         [Required]
         public string Id { get; set; }
+        public string Question { get; set; }
         [Required]
         public string Answer { get; set; }
     }

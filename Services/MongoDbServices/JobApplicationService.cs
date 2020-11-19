@@ -31,7 +31,7 @@ namespace JobApplicationAPI.Services
 
         public JobApplication GetApplication(string id)
         {
-            return (JobApplication)_jobApplications.Find(a => a.Id == id);
+            return _jobApplications.Find(a => a.Id == id).FirstOrDefault();
         }
 
         public JobApplication CreateApplication(JobApplication jobApplication)

@@ -22,7 +22,7 @@ namespace JobApplicationAPI.Controllers
         {
             try
             {
-                var jobApps = _jobApplicationService.GetApplications(false);
+                var jobApps = _jobApplicationService.GetApplications(true);
                 var jobAppsDTO = new List<JobApplicationDTO>();
                 mapJobApplications(jobApps, jobAppsDTO);
 

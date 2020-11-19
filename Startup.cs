@@ -11,6 +11,7 @@ namespace JobApplicationAPI
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,6 +31,16 @@ namespace JobApplicationAPI
             services.AddSingleton<JobApplicationService>();
             services.AddSingleton<QuestionService>();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins("http://localhost:4200",
+                                                          "https://localhost:44385");
+                                  });
+            });
+
             services.AddControllers();
         }
 
@@ -44,6 +55,8 @@ namespace JobApplicationAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseAuthorization();
 
